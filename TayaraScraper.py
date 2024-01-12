@@ -7,7 +7,7 @@ from urllib.parse import urljoin
 import time
 
 class TayaraScraper:
-    def __init__(self, max_pages=1, delay=2):
+    def __init__(self, max_pages=300, delay=2):
         self.base_url = "https://www.tayara.tn"
         self.links = []
         self.cars = []

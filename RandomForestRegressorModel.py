@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[48]:
-
-
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -12,6 +6,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, r2_score
+import pickle
 
 class RandomForestRegressorModel:
     def __init__(self):
@@ -43,7 +38,6 @@ class RandomForestRegressorModel:
         # Fit the pipeline on the entire dataset
         self.model.fit(X, y)
 
-
     def evaluate_model(self, X_test, y_test):
         # Make predictions on the test set
         y_pred = self.model.predict(X_test)
@@ -68,3 +62,13 @@ class RandomForestRegressorModel:
         predicted_price = self.model.predict(new_data)
 
         return predicted_price[0]
+
+    def save_model(self, filename='RandomForestRegressorModel.pkl'):
+        # Save the model using pickle
+        with open(filename, 'wb') as file:
+            pickle.dump(self.model, file)
+
+    def load_model(self, filename='RandomForestRegressorModel.pkl'):
+        # Load the model using pickle
+        with open(filename, 'rb') as file:
+            self.model = pickle.load(file)

@@ -1,16 +1,11 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[2]:
-
-
 import pandas as pd
 import datetime
 
 
 class PreparingData:
-    def __init__(self, df=None):
-        self.df = df if df is not None else pd.DataFrame()
+    def __init__(self):
+        dfS = pd.read_csv('C:/Users/ayari/NoteBook_Py/Py_Ensi/PS_Tayara/voitures.csv')
+        self.df = dfS if dfS is not None else pd.DataFrame()
 
     def drop_duplicates(self):
         self.df = self.df.drop_duplicates()
@@ -19,6 +14,11 @@ class PreparingData:
         self.df = self.df.dropna()
         self.df = self.df[~self.df.apply(lambda row: any(row == 'Autres'), axis=1)]
         self.df = self.df[~self.df.apply(lambda row: any(row == 'Autre'), axis=1)]
+
+    def cleaning_model_column(self):
+        model_pattern = r'\d+\.\d+L'  # Pattern to match models like "1.0L"
+        mask = self.df['Modele'].str.match(model_pattern, na=False, case=False)
+        self.df = self.df[~mask]
 
     def drop_columns_by_year(self):
         c = pd.to_datetime(self.df['Annee'], errors='coerce')
@@ -80,19 +80,6 @@ class PreparingData:
         self.df['Kilometrage'] = self.df['Kilometrage'].fillna(0).round().astype(int)
         self.df = self.df[self.df['Kilometrage'] >= 0]
 
-    def one_hot_encode_marque_couleur_columns(self):
-        # Save the 'Marque_voiture' column
-        marque_column = self.df['Marque_voiture']
-        color_column = self.df['Couleur']
-
-        # One-hot encode 'Marque_voiture' and 'Couleur' columns
-        self.df = pd.get_dummies(self.df, columns=['Marque_voiture', 'Couleur'], drop_first=True)
-
-        # Add the 'Marque_voiture' column back to the DataFrame
-        self.df['Marque_voiture'] = marque_column
-        self.df['Couleur'] = color_column
-
-
     def encode_type_boite_column(self):
         # Convert 'TypeBoite' to binary (1 for automatic and 0 for manual)
         self.df['TypeBoite'] = (self.df['TypeBoite'] == 'Automatique').astype(int)
@@ -110,42 +97,4 @@ class PreparingData:
 
     def encode_modele(self):
         self.df['Modele'] = pd.factorize(self.df['Modele'])[0] + 1
-        self.df.fillna(0, inplace=True)
-
-# if __name__ == "__main__":
-#
-#     # Lire le fichier CSV
-#     df = pd.read_csv('C:/Users/ayari/NoteBook_Py/Py_Ensi/PS_Tayara/voitures.csv')
-#
-#     # Créer une instance de la classe PreparingData
-#     data_cleaner = PreparingData(df)
-#
-#     # Appeler les différentes méthodes pour effectuer le nettoyage
-#     data_cleaner.drop_duplicates()
-#     data_cleaner.drop_nan_columns()
-#     data_cleaner.drop_columns_by_year()
-#     data_cleaner.clean_cylindre_column()
-#     data_cleaner.clean_carburant_column()
-#     data_cleaner.clean_type_boite_column()
-#     data_cleaner.filter_marque_and_couleur_columns()
-#     data_cleaner.clean_and_filter_puissance_column()
-#     data_cleaner.add_age_column()
-#     data_cleaner.filter_valid_year_column()
-#     data_cleaner.clean_prix_column()
-#     data_cleaner.convert_kilometrage_column()
-#
-#     df_cleaned = data_cleaner.df
-#     df_cleaned.to_csv('C:/Users/ayari/NoteBook_Py/Py_Ensi/PS_Tayara/cleaned_voitures.csv', index=False)
-#
-#     # data_cleaner.one_hot_encode_marque_couleur_columns()  # One-hot encode and drop original string columns
-#     data_cleaner.encode_type_boite_column()
-#     data_cleaner.encode_type_carburant()
-#     data_cleaner.encode_marque_column()
-#     data_cleaner.encode_couleur()
-#     data_cleaner.encode_modele()
-#
-#     # Le DataFrame nettoyé se trouve dans data_cleaner.df
-#     df_cleaned = data_cleaner.df
-#
-#     df_cleaned.to_csv('C:/Users/ayari/NoteBook_Py/Py_Ensi/PS_Tayara/Prepared_voitures.csv', index=False)
-
+        self.df.fillna(0, inplace=False)

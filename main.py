@@ -7,6 +7,9 @@ from LinearRegressionModel import LinearRegressionModel
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
+from Visualisation import DataVisualizer
+
+
 def main():
     try:
         # Scraping
@@ -16,11 +19,12 @@ def main():
         scraper.export_to_csv("C:/Users/ayari/NoteBook_Py/Py_Ensi/PS_Tayara/voitures.csv")
 
         # Preparing
-        preparer = PreparingData(pd.read_csv('C:/Users/ayari/NoteBook_Py/Py_Ensi/PS_Tayara/voitures.csv'))
+        preparer = PreparingData()
 
         preparer.drop_duplicates()
         preparer.drop_nan_columns()
         preparer.drop_columns_by_year()
+        preparer.cleaning_model_column()
         preparer.clean_cylindre_column()
         preparer.clean_carburant_column()
         preparer.clean_type_boite_column()
@@ -30,12 +34,32 @@ def main():
         preparer.filter_valid_year_column()
         preparer.clean_prix_column()
         preparer.convert_kilometrage_column()
-        preparer.one_hot_encode_marque_couleur_columns()
+        prepared_data = preparer.df
+        prepared_data.to_csv('C:/Users/ayari/NoteBook_Py/Py_Ensi/PS_Tayara/Cleaned_voitures.csv', index=False)
+
+        # data_visualizer = DataVisualizer()
+        # # Create a boxplot
+        # data_visualizer.create_boxplot(x_col='Marque_voiture', y_col='Prix', figsize=(15, 7))
+        #
+        # # Create a swarmplot
+        # data_visualizer.create_swarmplot(x_col='Annee', y_col='Prix', figsize=(20, 10))
+        #
+        # # Create a relplot
+        # data_visualizer.create_relplot(x_col='Kilometrage', y_col='Prix', height=7, aspect=1.5)
+        #
+        # # Create a fuel_type boxplot
+        # data_visualizer.create_fuel_boxplot(figsize=(14, 7))
+        #
+        # # Create a mixed relplot
+        # data_visualizer.create_mixed_relplot(figsize=(15, 7))
+
         preparer.encode_type_boite_column()
         preparer.encode_type_carburant()
         preparer.encode_marque_column()
         preparer.encode_couleur()
         preparer.encode_modele()
+
+
 
         prepared_data = preparer.df
         prepared_data.to_csv('C:/Users/ayari/NoteBook_Py/Py_Ensi/PS_Tayara/Prepared_voitures.csv', index=False)
@@ -58,6 +82,12 @@ def main():
         RFRM.evaluate_model(X_test, y_test)
         LRM.evaluate_model(X_test, y_test)
         DTRM.evaluate_model(X_test, y_test)
+
+        # Save the trained model
+        RFRM.save_model()
+
+        # Load the model
+        RFRM.load_model()
 
         # New data for prediction
         new_data = pd.DataFrame([[1.0, 4, 72000, 4, 'Essence', 'Manuelle', 'Suzuki', 'Bleu', 'Celerio', 2020]],
